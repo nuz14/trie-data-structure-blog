@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Trie Data Structure & Search Engine</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #fff7fb;
+    color: #4b2940;
+}
+
+#app {
+    min-height: 100vh;
+    background: linear-gradient(
+        135deg,
+        #fff8fc,
+        #fff0f6,
+        #fdf7ff
+    );
+}
+
+/* HEADER */
+
+.hero {
+    padding: 70px 8vw 55px;
+    max-width: 1150px;
+    margin: auto;
+}
+
+.eyebrow {
+    color: #d34f83;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.hero h1 {
+    font-size: clamp(42px, 7vw, 76px);
+    line-height: 1.05;
+    margin: 15px 0;
+    color: #4b2940;
+}
+
+.hero p {
+    font-size: 19px;
+    line-height: 1.7;
+    color: #765e6e;
+    max-width: 800px;
+}
+
+/* MAIN */
+
+.wrap {
+    max-width: 1150px;
+    margin: auto;
+    padding: 0 8vw 80px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+/* CARDS */
+
+.card {
+    background: white;
+    border: 1px solid #f2cddd;
+    border-radius: 22px;
+    padding: 27px;
+    box-shadow: 0 8px 24px rgba(180, 80, 120, 0.08);
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.tag {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    color: #d34f83;
+    text-transform: uppercase;
+}
+
+.card h2 {
+    font-size: 28px;
+    margin: 10px 0 12px;
+    color: #4b2940;
+}
+
+.card h3 {
+    font-size: 21px;
+    margin: 8px 0 10px;
+    color: #68435a;
+}
+
+.card p,
+.card li {
+    color: #765e6e;
+    line-height: 1.7;
+}
+
+/* NOTE */
+
+.note {
+    padding: 14px 16px;
+    border-left: 3px solid #e46b99;
+    background: #fff1f7;
+    border-radius: 8px;
+    color: #765e6e;
+}
+
+/* TRIE VISUAL */
+
+.tree {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+    margin: 22px 0;
+}
+
+.node {
+    border: 1px solid #e2a8c0;
+    border-radius: 10px;
+    padding: 11px 14px;
+    background: #fff7fb;
+    color: #68435a;
+    font-family: monospace;
+}
+
+.arrow {
+    color: #d34f83;
+    font-weight: bold;
+}
+
+/* ALGORITHM STEPS */
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.step {
+    background: #fff7fb;
+    border: 1px solid #f1ccdc;
+    border-radius: 15px;
+    padding: 17px;
+}
+
+.step b {
+    display: block;
+    margin-bottom: 7px;
+    color: #c84378;
+}
+
+/* CODE */
+
+.code {
+    background: #fff1f7;
+    border: 1px solid #f1c8d9;
+    border-radius: 14px;
+    padding: 18px;
+    overflow: auto;
+    color: #633b51;
+    line-height: 1.6;
+}
+
+/* SEARCH DEMO */
+
+.demo {
+    background: #fff7fb;
+    border: 1px solid #f0c8d9;
+    border-radius: 17px;
+    padding: 18px;
+}
+
+.row {
+    display: flex;
+    gap: 9px;
+}
+
+.input {
+    flex: 1;
+    background: white;
+    border: 1px solid #e6b7ca;
+    border-radius: 10px;
+    padding: 12px;
+    color: #4b2940;
+    outline: none;
+    font-size: 15px;
+}
+
+.input:focus {
+    border-color: #d34f83;
+    box-shadow: 0 0 0 3px #fbe0eb;
+}
+
+.button {
+    background: #d95787;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.button:hover {
+    background: #c84378;
+}
+
+.output {
+    margin-top: 14px;
+    color: #68435a;
+    min-height: 24px;
+    line-height: 1.6;
+}
+
+/* FOOTER */
+
+.footer {
+    text-align: center;
+    border-top: 1px solid #f2cddd;
+    padding: 30px;
+    color: #9a7184;
+}
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+
+    .grid,
+    .steps {
+        grid-template-columns: 1fr;
+    }
+
+    .row {
+        flex-direction: column;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<!-- HEADER -->
+
+<header class="hero">
+
+    <div class="eyebrow">
+        🌸 DSA · Student Technical Blog
+    </div>
+
+    <h1>
+        🌷 Trie Data Structure & Search Engine
+    </h1>
+
+    <p>
+        Understanding how a Trie stores words character-by-character
+        and how it can support fast search, prefix matching,
+        and autocomplete. ✨
+    </p>
+
+</header>
+
+
+<main class="wrap">
+
+<div class="grid">
+
+
+<!-- INTRODUCTION -->
+
+<article class="card full">
+
+    <span class="tag">
+        🌸 Introduction
+    </span>
+
+    <h2>
+        🌷 What is a Trie?
+    </h2>
+
+    <p>
+        A Trie, also called a prefix tree, is a tree-based data
+        structure designed for storing and searching strings.
+        Instead of storing every word as one complete item,
+        it stores characters along paths from a root node.
+        Words with the same beginning can therefore share
+        the same path.
+    </p>
+
+    <div class="note">
+
+        💗 Example: the words
+        <b>car</b>, <b>card</b>, and <b>care</b>
+        share the characters
+        c → a → r.
+
+    </div>
+
+</article>
+
+
+<!-- CORE IDEA -->
+
+<article class="card">
+
+    <span class="tag">
+        🌱 Core Idea
+    </span>
+
+    <h2>
+        🔎 How does it work?
+    </h2>
+
+    <p>
+        Each edge represents a character. Starting at the root,
+        characters are followed one at a time. A marker at the
+        end identifies a complete stored word.
+    </p>
+
+    <div class="tree">
+
+        <span class="node">🌳 root</span>
+
+        <span class="arrow">→</span>
+
+        <span class="node">c</span>
+
+        <span class="arrow">→</span>
+
+        <span class="node">a</span>
+
+        <span class="arrow">→</span>
+
+        <span class="node">r ✓</span>
+
+    </div>
+
+    <p>
+        The shared prefix means several words can reuse
+        the same nodes.
+    </p>
+
+</article>
+
+
+<!-- OPERATIONS -->
+
+<article class="card">
+
+    <span class="tag">
+        💗 Operations
+    </span>
+
+    <h2>
+        🔍 Search and Autocomplete
+    </h2>
+
+    <h3>
+        🔎 Search
+    </h3>
+
+    <p>
+        To search for a word, follow its characters from
+        the root. If a required character is missing,
+        the word is not present.
+    </p>
+
+    <h3>
+        ✨ Prefix Search
+    </h3>
+
+    <p>
+        After reaching a prefix, all complete words below
+        that node can be collected. This makes Tries useful
+        for autocomplete.
+    </p>
+
+</article>
+
+
+<!-- ALGORITHM -->
+
+<article class="card full">
+
+    <span class="tag">
+        🧩 Algorithm
+    </span>
+
+    <h2>
+        ⚙️ Basic Trie Operations
+    </h2>
+
+    <div class="steps">
+
+        <div class="step">
+
+            <b>
+                1 · 🌱 Start
+            </b>
+
+            Begin at the root node.
+
+        </div>
+
+
+        <div class="step">
+
+            <b>
+                2 · 🔄 Traverse
+            </b>
+
+            Read one character at a time.
+
+        </div>
+
+
+        <div class="step">
+
+            <b>
+                3 · 🧩 Create
+            </b>
+
+            Add a node when a character path does not exist.
+
+        </div>
+
+
+        <div class="step">
+
+            <b>
+                4 · 💗 Mark
+            </b>
+
+            Mark the final node as the end of the word.
+
+        </div>
+
+    </div>
+
+</article>
+
+
+<!-- COMPLEXITY -->
+
+<article class="card">
+
+    <span class="tag">
+        ⚡ Complexity
+    </span>
+
+    <h2>
+        💡 Why is it efficient?
+    </h2>
+
+    <p>
+        If a word has L characters, a basic Trie lookup
+        takes about O(L) time because the algorithm follows
+        the word's characters directly.
+    </p>
+
+    <p>
+        For prefix search, the cost also depends on the
+        prefix length and the number of results returned.
+    </p>
+
+</article>
+
+
+<!-- INTERACTIVE DEMO -->
+
+<article class="card">
+
+    <span class="tag">
+        🎀 Interactive Demo
+    </span>
+
+    <h2>
+        🔎 Try Prefix Search
+    </h2>
+
+    <p>
+        Enter a prefix to see matching words stored
+        in a small example Trie.
+    </p>
+
+    <div class="demo">
+
+        <div class="row">
+
+            <input
+                id="q"
+                class="input"
+                type="text"
+                placeholder="Try: app, ca, data"
+            >
+
+            <button
+                id="searchBtn"
+                class="button"
+                type="button"
+            >
+                🔍 Search
+            </button>
+
+        </div>
+
+        <div id="out" class="output">
+
+            🌸 Stored words:
+            apple, app, application, cat, car,
+            cart, data, database, date, design
+
+        </div>
+
+    </div>
+
+</article>
+
+
+<!-- SEARCH ENGINE -->
+
+<article class="card full">
+
+    <span class="tag">
+        🔗 Search Engine Connection
+    </span>
+
+    <h2>
+        🌐 Trie as a Search-Engine Component
+    </h2>
+
+    <p>
+        A Trie can be used as one part of a search or
+        autocomplete system. For example, when a user types
+        <b>dat</b>, the Trie can quickly locate the prefix
+        and return words such as <b>data</b>,
+        <b>database</b>, and <b>date</b>.
+    </p>
+
+    <p>
+        A complete search engine would usually combine this
+        with indexing, ranking, spelling correction,
+        and other techniques.
+    </p>
+
+    <pre class="code">insert("data")
+
+root → d → a → t → a
+
+prefix("dat")
+
+→ data
+→ database
+→ date</pre>
+
+</article>
+
+
+<!-- ADVANTAGES -->
+
+<article class="card">
+
+    <span class="tag">
+        💖 Advantages
+    </span>
+
+    <h2>
+        🌟 Benefits
+    </h2>
+
+    <ul>
+
+        <li>
+            ⚡ Fast word and prefix searching.
+        </li>
+
+        <li>
+            ✨ Natural support for autocomplete.
+        </li>
+
+        <li>
+            🌸 Shared prefixes reduce repeated character paths.
+        </li>
+
+        <li>
+            📚 Easy to organize dictionary-like string data.
+        </li>
+
+    </ul>
+
+</article>
+
+
+<!-- APPLICATIONS -->
+
+<article class="card">
+
+    <span class="tag">
+        🦋 Applications
+    </span>
+
+    <h2>
+        📚 Where can Tries be used?
+    </h2>
+
+    <ul>
+
+        <li>
+            🔎 Autocomplete in search boxes.
+        </li>
+
+        <li>
+            📖 Dictionary and spell-check systems.
+        </li>
+
+        <li>
+            👤 Contact-name suggestions.
+        </li>
+
+        <li>
+            🌐 IP routing and prefix matching.
+        </li>
+
+        <li>
+            🎮 Word games and text-processing systems.
+        </li>
+
+    </ul>
+
+</article>
+
+
+<!-- CONCLUSION -->
+
+<article class="card full">
+
+    <span class="tag">
+        🌷 Conclusion
+    </span>
+
+    <h2>
+        💐 Key Takeaway
+    </h2>
+
+    <p>
+        A Trie is a useful data structure when the main task
+        involves storing and searching strings, especially
+        when prefix matching is important. Its
+        character-by-character structure makes it a strong
+        foundation for autocomplete and search-related
+        applications.
+    </p>
+
+</article>
+
+
+</div>
+
+</main>
+
+
+<footer class="footer">
+
+    🌸 DSA Blog · Trie Data Structure & Search Engine 🌸
+
+</footer>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+const words = [
+    "apple",
+    "app",
+    "application",
+    "cat",
+    "car",
+    "cart",
+    "data",
+    "database",
+    "date",
+    "design"
+];
+
+
+function searchTrie() {
+
+    const input = document.getElementById("q");
+
+    const output = document.getElementById("out");
+
+    const query = input.value.trim().toLowerCase();
+
+
+    if (!query) {
+
+        output.textContent =
+            "🌸 Please enter a prefix.";
+
+        return;
+
+    }
+
+
+    const matches = words.filter(
+        word => word.startsWith(query)
+    );
+
+
+    if (matches.length > 0) {
+
+        output.textContent =
+            "💗 Matches: " + matches.join(", ");
+
+    } else {
+
+        output.textContent =
+            "🌷 No matching words found.";
+
+    }
+
+}
+
+
+document
+    .getElementById("searchBtn")
+    .addEventListener("click", searchTrie);
+
+
+document
+    .getElementById("q")
+    .addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+
+            searchTrie();
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
