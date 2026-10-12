@@ -1,770 +1,1202 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Trie Data Structure & Search Engine</title>
+<title>TrieBloom | Trie Data Structure</title>
 
 <style>
+:root {
+  --pink: #e879a9;
+  --pink-dark: #b84478;
+  --pink-light: #fff0f6;
+  --pink-soft: #fce0eb;
+  --white: #ffffff;
+  --plum: #49263d;
+  --text: #70596a;
+  --border: #f2d5e3;
+  --shadow: 0 12px 35px rgba(184, 68, 120, .09);
+}
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
 }
 
 body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #fff7fb;
-    color: #4b2940;
+  background: #fffafd;
+  color: var(--plum);
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.7;
 }
 
-#app {
-    min-height: 100vh;
-    background: linear-gradient(
-        135deg,
-        #fff8fc,
-        #fff0f6,
-        #fdf7ff
-    );
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-/* HEADER */
+button, input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  width: min(1100px, 90%);
+  margin: auto;
+}
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 250, 253, .95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  min-height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -.8px;
+  color: var(--pink-dark);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.nav-links a:hover {
+  color: var(--pink-dark);
+}
+
+.nav-links span {
+  color: #d9a6bf;
+}
 
 .hero {
-    padding: 70px 8vw 55px;
-    max-width: 1150px;
-    margin: auto;
+  padding: 85px 0 75px;
+  background:
+    radial-gradient(circle at 85% 20%, #fce0eb 0, transparent 28%),
+    radial-gradient(circle at 10% 90%, #fff0f6 0, transparent 32%);
 }
 
 .eyebrow {
-    color: #d34f83;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-size: 13px;
+  display: inline-block;
+  color: var(--pink-dark);
+  background: var(--pink-light);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  margin-bottom: 20px;
 }
 
-.hero h1 {
-    font-size: clamp(42px, 7vw, 76px);
-    line-height: 1.05;
-    margin: 15px 0;
-    color: #4b2940;
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  align-items: center;
+  gap: 45px;
 }
 
-.hero p {
-    font-size: 19px;
-    line-height: 1.7;
-    color: #765e6e;
-    max-width: 800px;
+h1 {
+  font-size: clamp(36px, 5.4vw, 61px);
+  line-height: 1.12;
+  letter-spacing: -2px;
+  margin-bottom: 22px;
 }
 
-/* MAIN */
-
-.wrap {
-    max-width: 1150px;
-    margin: auto;
-    padding: 0 8vw 80px;
+.gradient-text {
+  color: var(--pink-dark);
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 22px;
+.hero p, .section-intro {
+  color: var(--text);
+  max-width: 620px;
 }
 
-/* CARDS */
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  padding: 12px 18px;
+  border: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 13px;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.btn-primary {
+  background: var(--pink-dark);
+  color: white;
+  border-color: var(--pink-dark);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--pink-dark);
+}
+
+.hero-art {
+  padding: 25px;
+  border-radius: 28px;
+  background: white;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transform: rotate(1deg);
+}
+
+.art-label {
+  color: var(--text);
+  font-size: 12px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.mini-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.tree-node {
+  min-width: 43px;
+  min-height: 43px;
+  padding: 8px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  border: 1px solid #e8a5c2;
+  background: var(--pink-light);
+  color: var(--pink-dark);
+  font-weight: 800;
+}
+
+.tree-node.root {
+  background: var(--pink-dark);
+  color: white;
+}
+
+.tree-branches {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  position: relative;
+}
+
+.tree-branches::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 25%;
+  right: 25%;
+  height: 1px;
+  background: #e8a5c2;
+}
+
+.branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  position: relative;
+}
+
+.branch::before {
+  content: "";
+  height: 10px;
+  width: 1px;
+  background: #e8a5c2;
+}
+
+.branch small {
+  color: var(--text);
+  font-size: 10px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.stat {
+  padding: 15px 8px;
+  text-align: center;
+  border-radius: 14px;
+  background: var(--pink-light);
+}
+
+.stat strong {
+  display: block;
+  color: var(--pink-dark);
+  font-size: 21px;
+}
+
+.stat span {
+  font-size: 11px;
+  color: var(--text);
+}
+
+section {
+  padding: 75px 0;
+}
+
+.section-head {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 38px;
+}
+
+.section-head h2 {
+  font-size: clamp(27px, 4vw, 39px);
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin-bottom: 13px;
+}
+
+.section-head p {
+  color: var(--text);
+}
 
 .card {
-    background: white;
-    border: 1px solid #f2cddd;
-    border-radius: 22px;
-    padding: 27px;
-    box-shadow: 0 8px 24px rgba(180, 80, 120, 0.08);
-}
-
-.full {
-    grid-column: 1 / -1;
-}
-
-.tag {
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
-    color: #d34f83;
-    text-transform: uppercase;
-}
-
-.card h2 {
-    font-size: 28px;
-    margin: 10px 0 12px;
-    color: #4b2940;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: var(--shadow);
 }
 
 .card h3 {
-    font-size: 21px;
-    margin: 8px 0 10px;
-    color: #68435a;
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
-.card p,
-.card li {
-    color: #765e6e;
-    line-height: 1.7;
+.card p {
+  color: var(--text);
+  font-size: 14px;
 }
 
-/* NOTE */
-
-.note {
-    padding: 14px 16px;
-    border-left: 3px solid #e46b99;
-    background: #fff1f7;
-    border-radius: 8px;
-    color: #765e6e;
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
 }
 
-/* TRIE VISUAL */
-
-.tree {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 9px;
-    flex-wrap: wrap;
-    margin: 22px 0;
+.card-icon {
+  font-size: 27px;
+  margin-bottom: 12px;
 }
 
-.node {
-    border: 1px solid #e2a8c0;
-    border-radius: 10px;
-    padding: 11px 14px;
-    background: #fff7fb;
-    color: #68435a;
-    font-family: monospace;
+.pink-section {
+  background: var(--pink-light);
 }
 
-.arrow {
-    color: #d34f83;
-    font-weight: bold;
+.lab-grid {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 22px;
+  align-items: start;
 }
 
-/* ALGORITHM STEPS */
+.control-group {
+  margin: 20px 0;
+}
+
+.control-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+input[type="text"] {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: #fffafd;
+  border-radius: 11px;
+  padding: 12px 14px;
+  outline: none;
+  color: var(--plum);
+}
+
+input[type="text"]:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px #fce0eb;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text);
+  margin-top: 7px;
+}
+
+.word-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chip {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: white;
+  color: var(--pink-dark);
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chip:hover {
+  background: var(--pink-soft);
+}
+
+.result-box {
+  padding: 15px;
+  margin-top: 18px;
+  border-radius: 13px;
+  background: var(--pink-light);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.result-box strong {
+  color: var(--pink-dark);
+}
+
+.tree-canvas {
+  min-height: 255px;
+  border: 1px dashed #e8b2ca;
+  border-radius: 15px;
+  padding: 20px 10px;
+  overflow-x: auto;
+  background: #fffafd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#treeDisplay {
+  min-width: max-content;
+}
+
+.tree-level {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 7px 0;
+}
+
+.visual-node {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e8a5c2;
+  background: white;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--plum);
+  position: relative;
+}
+
+.visual-node.active {
+  background: var(--pink-dark);
+  color: white;
+  border-color: var(--pink-dark);
+  box-shadow: 0 0 0 4px #fce0eb;
+}
+
+.visual-node.end-node {
+  border: 2px solid var(--pink-dark);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 12px;
+  color: var(--text);
+  font-size: 11px;
+}
+
+.legend span::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: var(--pink-dark);
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.legend span:last-child::before {
+  background: white;
+  border: 2px solid var(--pink-dark);
+  vertical-align: -2px;
+}
+
+.suggestions {
+  margin-top: 12px;
+  display: grid;
+  gap: 7px;
+}
+
+.suggestion {
+  padding: 9px 12px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  color: var(--plum);
+}
+
+.suggestion:hover {
+  background: var(--pink-light);
+}
+
+.suggestion small {
+  color: var(--pink-dark);
+}
+
+.complexity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.complexity-card {
+  border-top: 4px solid var(--pink);
+}
+
+.big-o {
+  display: inline-block;
+  font-size: 25px;
+  color: var(--pink-dark);
+  font-weight: 800;
+  margin: 7px 0;
+}
+
+.comparison-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 530px;
+  font-size: 13px;
+}
+
+th, td {
+  text-align: left;
+  padding: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: var(--pink-light);
+  color: var(--pink-dark);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.application-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.application {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.application .card-icon {
+  margin: 0;
+}
 
 .steps {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
 }
 
 .step {
-    background: #fff7fb;
-    border: 1px solid #f1ccdc;
-    border-radius: 15px;
-    padding: 17px;
+  padding: 19px;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid var(--border);
 }
 
-.step b {
-    display: block;
-    margin-bottom: 7px;
-    color: #c84378;
+.step-number {
+  font-size: 24px;
+  font-weight: 800;
+  color: #e9a0bf;
 }
 
-/* CODE */
-
-.code {
-    background: #fff1f7;
-    border: 1px solid #f1c8d9;
-    border-radius: 14px;
-    padding: 18px;
-    overflow: auto;
-    color: #633b51;
-    line-height: 1.6;
+.step h3 {
+  font-size: 14px;
+  margin: 7px 0;
 }
 
-/* SEARCH DEMO */
-
-.demo {
-    background: #fff7fb;
-    border: 1px solid #f0c8d9;
-    border-radius: 17px;
-    padding: 18px;
+.step p {
+  font-size: 12px;
+  color: var(--text);
 }
 
-.row {
-    display: flex;
-    gap: 9px;
+footer {
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  font-size: 12px;
 }
 
-.input {
-    flex: 1;
-    background: white;
-    border: 1px solid #e6b7ca;
-    border-radius: 10px;
-    padding: 12px;
-    color: #4b2940;
-    outline: none;
-    font-size: 15px;
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-.input:focus {
-    border-color: #d34f83;
-    box-shadow: 0 0 0 3px #fbe0eb;
+.back-top {
+  color: var(--pink-dark);
+  font-weight: 700;
 }
-
-.button {
-    background: #d95787;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 20px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.button:hover {
-    background: #c84378;
-}
-
-.output {
-    margin-top: 14px;
-    color: #68435a;
-    min-height: 24px;
-    line-height: 1.6;
-}
-
-/* FOOTER */
-
-.footer {
-    text-align: center;
-    border-top: 1px solid #f2cddd;
-    padding: 30px;
-    color: #9a7184;
-}
-
-/* MOBILE */
 
 @media (max-width: 760px) {
+  .hero-grid, .lab-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .grid,
-    .steps {
-        grid-template-columns: 1fr;
-    }
+  .hero {
+    padding: 55px 0;
+  }
 
-    .row {
-        flex-direction: column;
-    }
+  .hero-art {
+    max-width: 430px;
+    width: 100%;
+    margin: auto;
+  }
 
+  section {
+    padding: 55px 0;
+  }
+
+  .about-grid, .complexity-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .application-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nav-inner {
+    flex-wrap: wrap;
+    padding: 12px 0;
+  }
+
+  .nav-links {
+    gap: 7px;
+    font-size: 12px;
+  }
 }
 
+@media (max-width: 390px) {
+  .logo {
+    font-size: 18px;
+  }
+
+  .nav-links {
+    font-size: 11px;
+    gap: 5px;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<div id="app">
+<nav>
+  <div class="container nav-inner">
+    <a href="#home" class="logo">🌸 TrieBloom</a>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <span>|</span>
+      <a href="#lab">Trie Lab</a>
+      <span>|</span>
+      <a href="#complexity">Complexity</a>
+      <span>|</span>
+      <a href="#applications">Applications</a>
+    </div>
+  </div>
+</nav>
 
-<!-- HEADER -->
-
-<header class="hero">
-
-    <div class="eyebrow">
-        🌸 DSA · Student Technical Blog
+<header class="hero" id="home">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">DSA · STUDENT TECHNICAL BLOG</span>
+      <h1>Search smarter with the <span class="gradient-text">Trie Data Structure.</span></h1>
+      <p>
+        Discover how words are stored as connected character paths,
+        how prefixes power autocomplete, and why Tries are useful
+        in modern search systems.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#lab">Explore the Trie Lab ↗</a>
+        <a class="btn btn-secondary" href="#how-it-works">Understand the concept</a>
+      </div>
     </div>
 
-    <h1>
-        🌷 Trie Data Structure & Search Engine
-    </h1>
-
-    <p>
-        Understanding how a Trie stores words character-by-character
-        and how it can support fast search, prefix matching,
-        and autocomplete. ✨
-    </p>
-
+    <div>
+      <div class="hero-art">
+        <div class="art-label">A tiny preview of a Trie 🌷</div>
+        <div class="mini-tree">
+          <div class="tree-node root">Root</div>
+          <div class="tree-node">a</div>
+          <div class="tree-branches">
+            <div class="branch">
+              <div class="tree-node">p</div>
+              <small>app</small>
+            </div>
+            <div class="branch">
+              <div class="tree-node">r</div>
+              <small>art</small>
+            </div>
+            <div class="branch">
+              <div class="tree-node">n</div>
+              <small>ant</small>
+            </div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>O(L)</strong><span>Prefix search</span></div>
+          <div class="stat"><strong>Words</strong><span>Shared prefixes</span></div>
+          <div class="stat"><strong>Fast</strong><span>Lookups</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </header>
 
-
-<main class="wrap">
-
-<div class="grid">
-
-
-<!-- INTRODUCTION -->
-
-<article class="card full">
-
-    <span class="tag">
-        🌸 Introduction
-    </span>
-
-    <h2>
-        🌷 What is a Trie?
-    </h2>
-
-    <p>
-        A Trie, also called a prefix tree, is a tree-based data
-        structure designed for storing and searching strings.
-        Instead of storing every word as one complete item,
-        it stores characters along paths from a root node.
-        Words with the same beginning can therefore share
-        the same path.
-    </p>
-
-    <div class="note">
-
-        💗 Example: the words
-        <b>car</b>, <b>card</b>, and <b>care</b>
-        share the characters
-        c → a → r.
-
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">01 · THE BIG IDEA</span>
+      <h2>What exactly is a Trie?</h2>
+      <p>
+        A Trie, also called a prefix tree, stores words by connecting
+        their characters. Words with the same beginning can share
+        the same path through the tree.
+      </p>
     </div>
 
-</article>
+    <div class="about-grid">
+      <article class="card">
+        <div class="card-icon">🌱</div>
+        <h3>Shared Prefixes</h3>
+        <p>
+          Words like <strong>app</strong>, <strong>apple</strong>,
+          and <strong>apply</strong> reuse the same starting characters.
+        </p>
+      </article>
 
+      <article class="card">
+        <div class="card-icon">🔎</div>
+        <h3>Character by Character</h3>
+        <p>
+          A search follows one character at a time instead of comparing
+          the query with every complete word.
+        </p>
+      </article>
 
-<!-- CORE IDEA -->
+      <article class="card">
+        <div class="card-icon">✨</div>
+        <h3>Prefix-Based Search</h3>
+        <p>
+          Once a prefix is found, a Trie can help retrieve words that
+          continue from that point.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
 
-<article class="card">
-
-    <span class="tag">
-        🌱 Core Idea
-    </span>
-
-    <h2>
-        🔎 How does it work?
-    </h2>
-
-    <p>
-        Each edge represents a character. Starting at the root,
-        characters are followed one at a time. A marker at the
-        end identifies a complete stored word.
-    </p>
-
-    <div class="tree">
-
-        <span class="node">🌳 root</span>
-
-        <span class="arrow">→</span>
-
-        <span class="node">c</span>
-
-        <span class="arrow">→</span>
-
-        <span class="node">a</span>
-
-        <span class="arrow">→</span>
-
-        <span class="node">r ✓</span>
-
+<section class="pink-section" id="lab">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">02 · INTERACTIVE PLAYGROUND</span>
+      <h2>Welcome to the Trie Lab 🌸</h2>
+      <p>
+        Type a prefix, explore matching words, and see the letters
+        highlighted in a simplified Trie visualization.
+      </p>
     </div>
 
-    <p>
-        The shared prefix means several words can reuse
-        the same nodes.
+    <div class="lab-grid">
+      <div class="card">
+        <h3>⌨️ Search the dictionary</h3>
+        <p>Try a prefix such as <strong>app</strong>, <strong>ca</strong>, or <strong>do</strong>.</p>
+
+        <div class="control-group">
+          <label for="prefixInput">Enter a word or prefix</label>
+          <input id="prefixInput" type="text" placeholder="Try typing app..." autocomplete="off">
+          <p class="hint">Suggestions update as you type.</p>
+        </div>
+
+        <div class="control-group">
+          <label>Try a quick example</label>
+          <div class="word-chips">
+            <button class="chip" data-word="app">app</button>
+            <button class="chip" data-word="ca">ca</button>
+            <button class="chip" data-word="do">do</button>
+            <button class="chip" data-word="tr">tr</button>
+          </div>
+        </div>
+
+        <div class="result-box" id="searchStatus" aria-live="polite">
+          <strong>Ready to explore!</strong><br>
+          Type a prefix to start your search.
+        </div>
+
+        <h3 style="margin-top:22px;">Matching suggestions</h3>
+        <div class="suggestions" id="suggestions" aria-live="polite"></div>
+      </div>
+
+      <div class="card">
+        <h3>🌳 Trie path visualizer</h3>
+        <p>Highlighted letters represent the typed prefix. Outlined letters mark the end of stored words.</p>
+
+        <div class="tree-canvas" style="margin-top:17px;">
+          <div id="treeDisplay"></div>
+        </div>
+
+        <div class="legend">
+          <span>Matched prefix</span>
+          <span>End of a word</span>
+        </div>
+
+        <div class="result-box">
+          <strong>What to notice</strong><br>
+          Words that share a prefix can reuse the same path. A prefix
+          may match even when it is not itself a complete word.
+        </div>
+      </div>
+    </div>
+    <p class="hint" style="text-align:center;margin-top:17px;">
+      Educational visualization using a small example dictionary; not a production search engine.
     </p>
+  </div>
+</section>
 
-</article>
+<section id="complexity">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">03 · PERFORMANCE</span>
+      <h2>Understanding Time Complexity</h2>
+      <p>
+        Let <strong>L</strong> represent the length of the word or prefix
+        being processed, and <strong>N</strong> the number of stored words.
+      </p>
+    </div>
 
+    <div class="complexity-grid">
+      <article class="card complexity-card">
+        <h3>Search</h3>
+        <div class="big-o">O(L)</div>
+        <p>Follows the characters of the search word. The lookup time does not require scanning every stored word.</p>
+      </article>
 
-<!-- OPERATIONS -->
+      <article class="card complexity-card">
+        <h3>Insertion</h3>
+        <div class="big-o">O(L)</div>
+        <p>Processes each character and creates any missing nodes along the word's path.</p>
+      </article>
 
-<article class="card">
+      <article class="card complexity-card">
+        <h3>Prefix Search</h3>
+        <div class="big-o">O(P + K)</div>
+        <p>Here P is the prefix length and K represents the work needed to collect matching results.</p>
+      </article>
+    </div>
 
-    <span class="tag">
-        💗 Operations
-    </span>
-
-    <h2>
-        🔍 Search and Autocomplete
-    </h2>
-
-    <h3>
-        🔎 Search
-    </h3>
-
-    <p>
-        To search for a word, follow its characters from
-        the root. If a required character is missing,
-        the word is not present.
+    <p class="hint" style="margin-top:15px;">
+      Complexity assumes efficient child-node access. Memory usage depends on the number of nodes and the implementation.
     </p>
+  </div>
+</section>
 
-    <h3>
-        ✨ Prefix Search
-    </h3>
+<section class="pink-section" id="comparison">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">04 · QUICK COMPARISON</span>
+      <h2>Trie vs. Linear Search</h2>
+      <p>Both approaches can find words, but their search strategies differ.</p>
+    </div>
 
-    <p>
-        After reaching a prefix, all complete words below
-        that node can be collected. This makes Tries useful
-        for autocomplete.
+    <div class="comparison-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Trie</th>
+            <th>Linear Search</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Search approach</td>
+            <td>Follows character paths</td>
+            <td>Checks items one by one</td>
+          </tr>
+          <tr>
+            <td>Search cost</td>
+            <td>O(L) for an exact lookup</td>
+            <td>O(N × L) for string comparisons in the worst case</td>
+          </tr>
+          <tr>
+            <td>Prefix suggestions</td>
+            <td>Naturally supported</td>
+            <td>Usually scans all words</td>
+          </tr>
+          <tr>
+            <td>Memory</td>
+            <td>Can use more nodes</td>
+            <td>Often simpler storage</td>
+          </tr>
+          <tr>
+            <td>Best suited for</td>
+            <td>Prefix and autocomplete tasks</td>
+            <td>Small lists and simple searches</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint" style="margin-top:13px;">
+      N = number of stored words; L = word length. Actual performance depends on data and implementation.
     </p>
+  </div>
+</section>
 
-</article>
+<section id="applications">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">05 · REAL-WORLD USES</span>
+      <h2>Where do Tries appear?</h2>
+      <p>
+        Prefix-based organization makes Tries useful in several
+        everyday computing applications.
+      </p>
+    </div>
 
+    <div class="application-grid">
+      <article class="card application">
+        <div class="card-icon">⌨️</div>
+        <div>
+          <h3>Search Autocomplete</h3>
+          <p>Suggests possible words while someone types into a search box.</p>
+        </div>
+      </article>
 
-<!-- ALGORITHM -->
+      <article class="card application">
+        <div class="card-icon">📖</div>
+        <div>
+          <h3>Spell Checkers</h3>
+          <p>Helps organize a dictionary and check whether a word exists.</p>
+        </div>
+      </article>
 
-<article class="card full">
+      <article class="card application">
+        <div class="card-icon">🌐</div>
+        <div>
+          <h3>Prefix Matching</h3>
+          <p>Finds stored keys that begin with a given sequence of characters.</p>
+        </div>
+      </article>
 
-    <span class="tag">
-        🧩 Algorithm
-    </span>
+      <article class="card application">
+        <div class="card-icon">🧭</div>
+        <div>
+          <h3>IP Routing</h3>
+          <p>Related prefix-tree structures can help organize network address prefixes.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
 
-    <h2>
-        ⚙️ Basic Trie Operations
-    </h2>
+<section class="pink-section">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">06 · HOW IT WORKS</span>
+      <h2>Four steps to understand a Trie</h2>
+      <p>From storing a word to finding a matching prefix.</p>
+    </div>
 
     <div class="steps">
+      <article class="step">
+        <div class="step-number">01</div>
+        <h3>Start at the Root</h3>
+        <p>The root is the starting point and usually represents an empty prefix.</p>
+      </article>
 
-        <div class="step">
+      <article class="step">
+        <div class="step-number">02</div>
+        <h3>Follow Characters</h3>
+        <p>Each edge leads to a node representing the next character.</p>
+      </article>
 
-            <b>
-                1 · 🌱 Start
-            </b>
+      <article class="step">
+        <div class="step-number">03</div>
+        <h3>Mark Word Ends</h3>
+        <p>A terminal marker identifies where a complete stored word ends.</p>
+      </article>
 
-            Begin at the root node.
-
-        </div>
-
-
-        <div class="step">
-
-            <b>
-                2 · 🔄 Traverse
-            </b>
-
-            Read one character at a time.
-
-        </div>
-
-
-        <div class="step">
-
-            <b>
-                3 · 🧩 Create
-            </b>
-
-            Add a node when a character path does not exist.
-
-        </div>
-
-
-        <div class="step">
-
-            <b>
-                4 · 💗 Mark
-            </b>
-
-            Mark the final node as the end of the word.
-
-        </div>
-
+      <article class="step">
+        <div class="step-number">04</div>
+        <h3>Find Suggestions</h3>
+        <p>Explore the descendants of a matching prefix to collect words.</p>
+      </article>
     </div>
+  </div>
+</section>
 
-</article>
-
-
-<!-- COMPLEXITY -->
-
-<article class="card">
-
-    <span class="tag">
-        ⚡ Complexity
-    </span>
-
-    <h2>
-        💡 Why is it efficient?
-    </h2>
-
-    <p>
-        If a word has L characters, a basic Trie lookup
-        takes about O(L) time because the algorithm follows
-        the word's characters directly.
-    </p>
-
-    <p>
-        For prefix search, the cost also depends on the
-        prefix length and the number of results returned.
-    </p>
-
-</article>
-
-
-<!-- INTERACTIVE DEMO -->
-
-<article class="card">
-
-    <span class="tag">
-        🎀 Interactive Demo
-    </span>
-
-    <h2>
-        🔎 Try Prefix Search
-    </h2>
-
-    <p>
-        Enter a prefix to see matching words stored
-        in a small example Trie.
-    </p>
-
-    <div class="demo">
-
-        <div class="row">
-
-            <input
-                id="q"
-                class="input"
-                type="text"
-                placeholder="Try: app, ca, data"
-            >
-
-            <button
-                id="searchBtn"
-                class="button"
-                type="button"
-            >
-                🔍 Search
-            </button>
-
-        </div>
-
-        <div id="out" class="output">
-
-            🌸 Stored words:
-            apple, app, application, cat, car,
-            cart, data, database, date, design
-
-        </div>
-
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">07 · KEY TAKEAWAY</span>
+      <h2>Small prefixes, smarter searches. 💗</h2>
+      <p>
+        A Trie is a tree-based data structure designed to store strings
+        through shared character paths. It can make prefix searches
+        efficient and provides a useful foundation for autocomplete
+        and dictionary-based applications.
+      </p>
+      <div class="actions" style="justify-content:center;">
+        <a href="#lab" class="btn btn-primary">Try the Trie Lab again ↑</a>
+      </div>
     </div>
+  </div>
+</section>
 
-</article>
-
-
-<!-- SEARCH ENGINE -->
-
-<article class="card full">
-
-    <span class="tag">
-        🔗 Search Engine Connection
-    </span>
-
-    <h2>
-        🌐 Trie as a Search-Engine Component
-    </h2>
-
-    <p>
-        A Trie can be used as one part of a search or
-        autocomplete system. For example, when a user types
-        <b>dat</b>, the Trie can quickly locate the prefix
-        and return words such as <b>data</b>,
-        <b>database</b>, and <b>date</b>.
-    </p>
-
-    <p>
-        A complete search engine would usually combine this
-        with indexing, ranking, spelling correction,
-        and other techniques.
-    </p>
-
-    <pre class="code">insert("data")
-
-root → d → a → t → a
-
-prefix("dat")
-
-→ data
-→ database
-→ date</pre>
-
-</article>
-
-
-<!-- ADVANTAGES -->
-
-<article class="card">
-
-    <span class="tag">
-        💖 Advantages
-    </span>
-
-    <h2>
-        🌟 Benefits
-    </h2>
-
-    <ul>
-
-        <li>
-            ⚡ Fast word and prefix searching.
-        </li>
-
-        <li>
-            ✨ Natural support for autocomplete.
-        </li>
-
-        <li>
-            🌸 Shared prefixes reduce repeated character paths.
-        </li>
-
-        <li>
-            📚 Easy to organize dictionary-like string data.
-        </li>
-
-    </ul>
-
-</article>
-
-
-<!-- APPLICATIONS -->
-
-<article class="card">
-
-    <span class="tag">
-        🦋 Applications
-    </span>
-
-    <h2>
-        📚 Where can Tries be used?
-    </h2>
-
-    <ul>
-
-        <li>
-            🔎 Autocomplete in search boxes.
-        </li>
-
-        <li>
-            📖 Dictionary and spell-check systems.
-        </li>
-
-        <li>
-            👤 Contact-name suggestions.
-        </li>
-
-        <li>
-            🌐 IP routing and prefix matching.
-        </li>
-
-        <li>
-            🎮 Word games and text-processing systems.
-        </li>
-
-    </ul>
-
-</article>
-
-
-<!-- CONCLUSION -->
-
-<article class="card full">
-
-    <span class="tag">
-        🌷 Conclusion
-    </span>
-
-    <h2>
-        💐 Key Takeaway
-    </h2>
-
-    <p>
-        A Trie is a useful data structure when the main task
-        involves storing and searching strings, especially
-        when prefix matching is important. Its
-        character-by-character structure makes it a strong
-        foundation for autocomplete and search-related
-        applications.
-    </p>
-
-</article>
-
-
-</div>
-
-</main>
-
-
-<footer class="footer">
-
-    🌸 DSA Blog · Trie Data Structure & Search Engine 🌸
-
+<footer>
+  <div class="container footer-inner">
+    <div>
+      <strong style="color:var(--pink-dark);">🌸 TrieBloom</strong>
+      <p>Student Technical Blog · Data Structures & Algorithms</p>
+    </div>
+    <a class="back-top" href="#home">↑ Back to Top</a>
+  </div>
 </footer>
 
-</div>
-
-
-<!-- JAVASCRIPT -->
-
 <script>
-
 const words = [
-    "apple",
-    "app",
-    "application",
-    "cat",
-    "car",
-    "cart",
-    "data",
-    "database",
-    "date",
-    "design"
+  "app", "apple", "apply", "application", "apt",
+  "art", "artist", "arrow",
+  "ant", "and", "animal",
+  "cat", "car", "care", "careful", "cart",
+  "dog", "doll", "door",
+  "tree", "trie", "track", "train"
 ];
 
+const prefixInput = document.getElementById("prefixInput");
+const searchStatus = document.getElementById("searchStatus");
+const suggestions = document.getElementById("suggestions");
+const treeDisplay = document.getElementById("treeDisplay");
 
-function searchTrie() {
-
-    const input = document.getElementById("q");
-
-    const output = document.getElementById("out");
-
-    const query = input.value.trim().toLowerCase();
-
-
-    if (!query) {
-
-        output.textContent =
-            "🌸 Please enter a prefix.";
-
-        return;
-
-    }
-
-
-    const matches = words.filter(
-        word => word.startsWith(query)
-    );
-
-
-    if (matches.length > 0) {
-
-        output.textContent =
-            "💗 Matches: " + matches.join(", ");
-
-    } else {
-
-        output.textContent =
-            "🌷 No matching words found.";
-
-    }
-
+function findMatches(prefix) {
+  const p = prefix.toLowerCase().trim();
+  return words.filter(word => word.startsWith(p)).sort();
 }
 
+function renderSuggestions(prefix) {
+  suggestions.replaceChildren();
 
-document
-    .getElementById("searchBtn")
-    .addEventListener("click", searchTrie);
+  if (!prefix) {
+    suggestions.textContent = "Start typing to see suggestions.";
+    return;
+  }
 
+  const matches = findMatches(prefix).slice(0, 8);
 
-document
-    .getElementById("q")
-    .addEventListener("keydown", function(event) {
+  if (!matches.length) {
+    suggestions.textContent = "No matching words found. Try another prefix.";
+    return;
+  }
 
-        if (event.key === "Enter") {
+  matches.forEach(word => {
+    const button = document.createElement("button");
+    button.className = "suggestion";
+    button.type = "button";
 
-            searchTrie();
+    const wordLabel = document.createElement("strong");
+    wordLabel.textContent = word;
 
-        }
+    const hint = document.createElement("small");
+    hint.textContent = "Select ↗";
 
+    button.append(wordLabel, hint);
+
+    button.addEventListener("click", () => {
+      prefixInput.value = word;
+      updateLab();
     });
 
+    suggestions.appendChild(button);
+  });
+}
+
+function renderTree(prefix) {
+  treeDisplay.replaceChildren();
+
+  const p = prefix.toLowerCase().trim();
+  const sample = ["app", "apple", "apply", "apt"];
+
+  const wordsToShow = p
+    ? findMatches(p).slice(0, 5)
+    : sample;
+
+  if (!wordsToShow.length) {
+    const message = document.createElement("p");
+    message.textContent = "No matching paths to display.";
+    message.style.color = "#70596a";
+    treeDisplay.appendChild(message);
+    return;
+  }
+
+  const maxLength = Math.max(...wordsToShow.map(word => word.length));
+
+  for (let level = 0; level < maxLength; level++) {
+    const row = document.createElement("div");
+    row.className = "tree-level";
+
+    wordsToShow.forEach(word => {
+      if (word.length <= level) return;
+
+      const node = document.createElement("div");
+      node.className = "visual-node";
+      node.textContent = word[level];
+
+      if (level < p.length && word[level] === p[level]) {
+        node.classList.add("active");
+      }
+
+      if (level === word.length - 1) {
+        node.classList.add("end-node");
+        node.title = "End of word: " + word;
+      }
+
+      row.appendChild(node);
+    });
+
+    treeDisplay.appendChild(row);
+  }
+}
+
+function updateLab() {
+  const prefix = prefixInput.value.trim().toLowerCase();
+  const matches = prefix ? findMatches(prefix) : [];
+
+  if (!prefix) {
+    searchStatus.replaceChildren();
+
+    const strong = document.createElement("strong");
+    strong.textContent = "Ready to explore!";
+
+    searchStatus.append(strong, document.createElement("br"),
+      document.createTextNode("Type a prefix to start your search."));
+  } else {
+    searchStatus.replaceChildren();
+
+    const strong = document.createElement("strong");
+    strong.textContent = matches.length
+      ? "Prefix found!"
+      : "No matching prefix";
+
+    const detail = document.createElement("div");
+    detail.textContent = matches.length
+      ? matches.length + " matching word(s): " + matches.join(", ")
+      : "No stored words begin with \"" + prefix + "\".";
+
+    searchStatus.append(strong, document.createElement("br"), detail);
+  }
+
+  renderSuggestions(prefix);
+  renderTree(prefix);
+}
+
+prefixInput.addEventListener("input", updateLab);
+
+document.querySelectorAll("[data-word]").forEach(button => {
+  button.addEventListener("click", () => {
+    prefixInput.value = button.dataset.word;
+    updateLab();
+  });
+});
+
+updateLab();
 </script>
 
 </body>
